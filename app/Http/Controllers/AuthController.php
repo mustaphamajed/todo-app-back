@@ -17,7 +17,6 @@ class AuthController extends Controller
                 'name' => 'required|string|max:255',
                 'firstname' => 'required|string|max:255',
                 'phone' => 'required|string',
-
                 'email' => 'required|email|unique:users,email',
                 'password' => 'required|string|min:6',
             ]);
@@ -32,7 +31,10 @@ class AuthController extends Controller
 
             return response()->json(['message' => 'User registered successfully', 'user' => $user], 201);
         } catch (ValidationException $e) {
-            return response()->json(['message' => 'Validation failed', 'errors' => $e->errors()], 422);
+            $errors = $e->errors();
+            $firstErrorMessage = reset($errors)[0];
+
+            return response()->json(['message' => 'Validation failed', 'error' => $firstErrorMessage], 422);
         }
     }
 
