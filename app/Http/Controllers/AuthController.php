@@ -49,7 +49,7 @@ class AuthController extends Controller
             $credentials = $request->only('email', 'password');
             $user = User::where('email', $credentials['email'])->first();
 
-            if ($user) {
+            if ($user && Hash::check($credentials['password'], $user->password)) {
                 $token = $user->createToken('auth_token')->plainTextToken;
                 $user->makeVisible(['id', 'name', 'email', 'phone', 'firstname']);
                 return response()->json(['message' => 'Login successful', 'user' => $user, 'token' => $token], 200);
@@ -57,7 +57,10 @@ class AuthController extends Controller
                 throw ValidationException::withMessages(['email' => 'Invalid credentials']);
             }
         } catch (ValidationException $e) {
-            return response()->json(['message' => 'Login failed', 'errors' => $e->errors()], 401);
+            $errors = $e->errors();
+            $firstErrorMessage = reset($errors)[0];
+
+            return response()->json(['message' => 'Login failed', 'error' => $firstErrorMessage], 401);
         }
     }
 }
