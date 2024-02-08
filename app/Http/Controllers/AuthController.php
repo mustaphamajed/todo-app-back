@@ -63,4 +63,18 @@ class AuthController extends Controller
             return response()->json(['message' => 'Login failed', 'error' => $firstErrorMessage], 401);
         }
     }
+    public function getAuthenticatedUser(Request $request)
+    {
+        try {
+            $user = Auth::user();
+
+            if ($user) {
+                return response()->json(['user' => $user], 200);
+            } else {
+                return response()->json(['message' => 'User not found'], 404);
+            }
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Error retrieving user'], 500);
+        }
+    }
 }
