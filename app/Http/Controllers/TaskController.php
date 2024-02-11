@@ -30,17 +30,14 @@ class TaskController extends Controller
         try {
             $request->validate([
                 'title' => 'required|string|max:255',
-                'description' => 'nullable|string',
-                'status' => 'required|in:pending,completed',
-                'user_id' => 'nullable|exists:users,id',
+                'description' => 'required|string|max:255',
             ]);
 
             // Create a new task
             $task = Task::create([
                 'title' => $request->input('title'),
                 'description' => $request->input('description'),
-                'status' => $request->input('status'),
-                'user_id' => $request->input('user_id'),
+                'status' => 'pending',
             ]);
 
             return response()->json(['message' => 'Task created successfully', 'task' => $task], 201);
