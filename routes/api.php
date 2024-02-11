@@ -23,8 +23,9 @@ Route::post('/login', [AuthController::class, 'login']);
 // Protected routes
 Route::middleware('auth:sanctum')->group(function () {
 
-
+    // User routes
     Route::get('/me', [AuthController::class, 'getAuthenticatedUser']);
+    Route::get('/users', [AuthController::class, 'getAllUsers']);
 
     // Task routes
     Route::get('/tasks', [TaskController::class, 'index']);
