@@ -11,7 +11,7 @@ class TaskController extends Controller
     // Retrieve all tasks
     public function index()
     {
-        $tasks = Task::all();
+        $tasks = Task::with('user')->get();
 
         return response()->json(['tasks' => $tasks], 200);
     }
@@ -32,7 +32,7 @@ class TaskController extends Controller
                 'title' => 'required|string|max:255',
                 'description' => 'nullable|string',
                 'status' => 'required|in:pending,completed',
-                'user_id' => 'required|exists:users,id',
+                'user_id' => 'nullable|exists:users,id',
             ]);
 
             // Create a new task
