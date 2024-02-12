@@ -37,7 +37,7 @@ class TaskController extends Controller
             $task = Task::create([
                 'title' => $request->input('title'),
                 'description' => $request->input('description'),
-                'status' => 'pending',
+                'status' => 'active',
             ]);
 
             return response()->json(['message' => 'Task created successfully', 'task' => $task], 201);
