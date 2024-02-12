@@ -46,6 +46,29 @@ class TaskController extends Controller
             return response()->json(['message' => 'Validation failed', 'errors' => $e->errors()], 422);
         }
     }
+
+    public function update(Request $request, $id)
+    {
+        try {
+            $request->validate([
+                'title' => 'required|string|max:255',
+                'description' => 'required|string|max:255',
+            ]);
+
+            $task = Task::findOrFail($id);
+
+            $task->update([
+                'title' => $request->input('title'),
+                'description' => $request->input('description'),
+            ]);
+            $task->load('user');
+
+            return response()->json(['message' => 'Task updated successfully', 'task' => $task], 201);
+        } catch (ValidationException $e) {
+            return response()->json(['message' => 'Validation failed', 'errors' => $e->errors()], 422);
+        }
+    }
+
     public function markAsCompleted($id)
     {
         try {
