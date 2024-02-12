@@ -51,18 +51,12 @@ class TaskController extends Controller
         try {
 
             $task = Task::findOrFail($id);
-            // Check if the authenticated user is the owner of the task
-            if (auth()->id() !== $task->user_id) {
-                return response()->json(['message' => 'Unauthorized. You do not have permission to update this task.'], 403);
-            }
-
             $task->update([
                 'status' => 'completed',
             ]);
+            $task->load('user');
 
             return response()->json(['message' => 'Task updated successfully', 'task' => $task], 200);
-        } catch (ValidationException $e) {
-            return response()->json(['message' => 'Validation failed', 'errors' => $e->errors()], 422);
         } catch (\Exception $e) {
             return response()->json(['message' => 'Task not found'], 404);
         }
