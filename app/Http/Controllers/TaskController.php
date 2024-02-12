@@ -45,12 +45,9 @@ class TaskController extends Controller
             return response()->json(['message' => 'Validation failed', 'errors' => $e->errors()], 422);
         }
     }
-    public function update(Request $request, $id)
+    public function markAsCompleted($id)
     {
         try {
-            $request->validate([
-                'status' => 'required|in:pending,completed',
-            ]);
 
             $task = Task::findOrFail($id);
             // Check if the authenticated user is the owner of the task
@@ -59,7 +56,7 @@ class TaskController extends Controller
             }
 
             $task->update([
-                'status' => $request->input('status'),
+                'status' => 'completed',
             ]);
 
             return response()->json(['message' => 'Task updated successfully', 'task' => $task], 200);
