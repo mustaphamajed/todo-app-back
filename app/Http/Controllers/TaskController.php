@@ -5,14 +5,33 @@ namespace App\Http\Controllers;
 use App\Models\Task;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
 
 class TaskController extends Controller
 {
     // Retrieve all tasks
-    public function index()
+    public function index(Request $request)
     {
-        $tasks = Task::with('user')->get();
+        $sortField = $request->query('sort');
+
+        $query = Task::with('user');
+        $user = Auth::user();
+
+        if ($sortField === 'user_name') {
+            $query->leftJoin('users', 'tasks.user_id', '=', 'users.id')
+                ->orderBy('users.name', 'desc')
+                ->select('tasks.*');
+        } elseif ($sortField === 'status') {
+            $query->orderBy('status', "desc");
+        } elseif ($sortField === 'received') {
+            $query->where('tasks.user_id', $user->id)->orderBy('created_at', 'desc');
+        } else {
+            $query->orderBy('created_at', "desc");
+        }
+
+        $tasks = $query->get();
 
         return response()->json(['tasks' => $tasks], 200);
     }
