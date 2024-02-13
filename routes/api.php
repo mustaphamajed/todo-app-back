@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\StatisticsController;
 use App\Http\Controllers\TaskController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -35,4 +36,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/tasks/markAsCompleted/{id}', [TaskController::class, 'markAsCompleted']);
     Route::put('/tasks/assign/{id}', [TaskController::class, 'assignTaskToUser']);
     // Route::delete('/tasks/{id}', [TaskController::class, 'destroy']);
+
+    Route::get('/statistics', [StatisticsController::class, 'getStats']);
 });
