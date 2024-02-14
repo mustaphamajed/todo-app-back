@@ -9,22 +9,30 @@ use Illuminate\Http\Request;
 
 class StatisticsController extends Controller
 {
-    //
+    /**
+     * Get statistics based on the specified timeframe.
+     */
     public function getStats(Request $request)
     {
         try {
+            // Get the timeframe from the request, default is 'daily'
             $timeframe = $request->input('timeframe', 'daily');
+            // Calculate the start and end date based on the timeframe
             $startDate = $this->getStartDate($timeframe);
             $endDate = $this->getEndDate($timeframe, $startDate);
 
+            // Retrieve completed tasks within the specified timeframe
             $completedTasks = $this->getCompletedTasks($startDate, $endDate);
 
+            // Calculate statistics based on completed tasks
             $completedTasksCount = $completedTasks->count();
             $totalTasksCount = $this->getTotalTasksCount($startDate, $endDate);
             $totalCompletionTime = $this->getTotalCompletionTime($completedTasks);
 
+            // Calculate average completion time per task
             $averageTime = $completedTasksCount > 0 ? $totalCompletionTime / $completedTasksCount : 0;
 
+            // Get the total count of tasks assigned to users
             $totalAssignedTasksCount = $this->getTotalAssignedTasksCount($startDate, $endDate);
 
             return response()->json([
@@ -34,11 +42,13 @@ class StatisticsController extends Controller
                 'total_assigned_tasks_count' => $totalAssignedTasksCount,
             ]);
         } catch (\Exception $e) {
-            Log::error($e->getMessage());
+            Log::error('Error calculating statistics: ' . $e->getMessage());
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }
-
+    /**
+     * Get the total count of tasks assigned to users within a specified timeframe.
+     */
 
     private function getTotalAssignedTasksCount($startDate, $endDate)
     {
@@ -47,7 +57,9 @@ class StatisticsController extends Controller
             ->count();
     }
 
-
+    /**
+     * Get completed tasks within a specified timeframe.
+     */
     private function getCompletedTasks($startDate, $endDate)
     {
         return Task::where('status', 'completed')
@@ -55,12 +67,19 @@ class StatisticsController extends Controller
             ->get();
     }
 
+    /**
+     * Get the total count of tasks created within a specified timeframe.
+     */
     private function getTotalTasksCount($startDate, $endDate)
     {
         return Task::whereBetween('created_at', [$startDate, $endDate])
             ->count();
     }
 
+
+    /**
+     * Calculate the total completion time of completed tasks.
+     */
     private function getTotalCompletionTime($completedTasks)
     {
         $totalCompletionTime = 0;
@@ -72,6 +91,9 @@ class StatisticsController extends Controller
         return $totalCompletionTime;
     }
 
+    /**
+     * Get the start date based on the specified timeframe.
+     */
     private function getStartDate($timeframe)
     {
         switch ($timeframe) {
@@ -85,6 +107,11 @@ class StatisticsController extends Controller
                 return Carbon::today();
         }
     }
+
+
+    /**
+     * Get the end date based on the specified timeframe.
+     */
 
     private function getEndDate($timeframe, $startDate)
     {
